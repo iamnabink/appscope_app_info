@@ -14,6 +14,8 @@ class AppScanner {
           icon: app['icon'] != null ? Uint8List.fromList(List<int>.from(app['icon'])) : null,
           framework: FrameworkType.native, // Will be detected later
           apkPath: app['apkPath'],
+          isSystemApp: app['isSystemApp'] ?? false,
+          isUpdatedSystemApp: app['isUpdatedSystemApp'] ?? false,
         );
       }).toList();
     } catch (e) {

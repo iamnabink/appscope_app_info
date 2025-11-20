@@ -91,12 +91,19 @@ class _AppScannerScreenState extends State<AppScannerScreen> {
 
     try {
       final apps = await _appScanner.scanInstalledApps();
+      
+      // Filter out system apps (but keep updated system apps that users can interact with)
+      final userApps = apps.where((app) {
+        // Exclude system apps, but include updated system apps (apps that were system but user updated)
+        return app.isSystemApp != true || app.isUpdatedSystemApp == true;
+      }).toList();
+      
       final List<AppInfo> detectedApps = [];
 
       // Process apps in batches to avoid blocking UI
       const batchSize = 10;
-      for (int i = 0; i < apps.length; i += batchSize) {
-        final batch = apps.skip(i).take(batchSize).toList();
+      for (int i = 0; i < userApps.length; i += batchSize) {
+        final batch = userApps.skip(i).take(batchSize).toList();
         
         await Future.wait(
           batch.map((app) async {
@@ -108,6 +115,8 @@ class _AppScannerScreenState extends State<AppScannerScreen> {
                 icon: app.icon,
                 framework: framework,
                 apkPath: app.apkPath,
+                isSystemApp: app.isSystemApp,
+                isUpdatedSystemApp: app.isUpdatedSystemApp,
               );
             } catch (e) {
               // If detection fails, mark as Native
@@ -117,6 +126,8 @@ class _AppScannerScreenState extends State<AppScannerScreen> {
                 icon: app.icon,
                 framework: FrameworkType.native,
                 apkPath: app.apkPath,
+                isSystemApp: app.isSystemApp,
+                isUpdatedSystemApp: app.isUpdatedSystemApp,
               );
             }
           }),

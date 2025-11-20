@@ -100,6 +100,10 @@ class MainActivity: FlutterActivity() {
                 val packageName = packageInfo.packageName
                 val apkPath = appInfo.sourceDir
                 
+                // Check if system app
+                val isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+                val isUpdatedSystemApp = (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
+                
                 // Get app icon
                 val icon = appInfo.loadIcon(packageManager)
                 val iconBytes = drawableToByteArray(icon)
@@ -108,7 +112,9 @@ class MainActivity: FlutterActivity() {
                     "packageName" to packageName,
                     "appName" to appName,
                     "icon" to iconBytes,
-                    "apkPath" to apkPath
+                    "apkPath" to apkPath,
+                    "isSystemApp" to isSystemApp,
+                    "isUpdatedSystemApp" to isUpdatedSystemApp
                 ))
             } catch (e: Exception) {
                 // Skip apps that can't be accessed
