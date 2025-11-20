@@ -14,6 +14,7 @@ dependencies:
   path: ^1.8.3
   archive: ^3.4.0
   shimmer: ^3.0.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
