@@ -1,4 +1,4 @@
-name: app_framework_detector
+name: whoamie_app
 description: A Flutter app that scans installed apps and detects their frameworks
 publish_to: 'none'
 version: 1.0.0+1

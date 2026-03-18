@@ -1,4 +1,4 @@
-package com.example.app_framework_detector
+package com.example.whoamie_app
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
