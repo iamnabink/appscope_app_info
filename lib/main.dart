@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'services/theme_service.dart';
-import 'widgets/splash_screen.dart';
-import 'pages/app_scanner_page.dart';
+import 'app/services/theme_service.dart';
+import 'app/widgets/splash_screen.dart';
+import 'app/pages/app_scanner_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
