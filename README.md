@@ -15,6 +15,7 @@ AppScope is a Flutter utility (maintained by [@iamnabink](https://github.com/iam
 <p align="center">
   <img src="assets/ss1.png" alt="AppScope home list" width="45%" />
   <img src="assets/ss2.png" alt="AppScope detail view" width="45%" />
+  <img src="assets/ss3.png" alt="AppScope detail view" width="45%" />
 </p>
 
 ## 🏗️ Tech Stack
