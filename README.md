@@ -1,6 +1,6 @@
-# AppScope
+# AppDNA
 
-AppScope is a Flutter utility (maintained by [@iamnabink](https://github.com/iamnabink)) that scans Android devices for installed applications, detects their underlying app frameworks, and gives you detailed insights—including APK metadata, SDK targets, install date, size, and more. You can jump into a dedicated detail screen for each app and trigger an uninstall workflow with confirmation and loader states.
+AppDNA is a Flutter utility (maintained by [@iamnabink](https://github.com/iamnabink)) that scans Android devices for installed applications, detects their underlying app frameworks, and gives you detailed insights—including APK metadata, SDK targets, install date, size, and more. You can jump into a dedicated detail screen for each app and trigger an uninstall workflow with confirmation and loader states.
 
 ## ✨ Features
 
@@ -13,9 +13,10 @@ AppScope is a Flutter utility (maintained by [@iamnabink](https://github.com/iam
 ## 📸 Screenshots (recommended)
 
 <p align="center">
-  <img src="assets/ss1.png" alt="AppScope home list" width="45%" />
-  <img src="assets/ss2.png" alt="AppScope detail view" width="45%" />
-  <img src="assets/ss3.png" alt="AppScope detail view" width="45%" />
+  <img src="assets/ss1.png" alt="AppDNA home list" width="45%" />
+  <img src="assets/ss2.png" alt="AppDNA detail view" width="45%" />
+  <img src="assets/ss3.png" alt="AppDNA detail view" width="45%" />
+  <img src="assets/ss43.png" alt="AppDNA detail view" width="45%" />
 </p>
 
 ## 🏗️ Tech Stack

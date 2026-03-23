@@ -84,7 +84,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'AppScope',
+                      'AppDNA',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -137,4 +137,3 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
-

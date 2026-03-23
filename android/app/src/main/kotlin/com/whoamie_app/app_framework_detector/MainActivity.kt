@@ -1,4 +1,4 @@
-package com.example.whoamie_app
+package com.whoamie_app.appdna
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo

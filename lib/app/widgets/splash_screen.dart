@@ -46,7 +46,7 @@ class SplashScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'AppScope',
+                'AppDNA',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -79,4 +79,3 @@ class SplashScreen extends StatelessWidget {
     );
   }
 }
-

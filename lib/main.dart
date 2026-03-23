@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return MaterialApp(
-        title: 'AppScope',
+        title: 'AppDNA',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: _seed),
           useMaterial3: true,
@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     return MaterialApp(
-      title: 'AppScope',
+      title: 'AppDNA',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: _seed),
         useMaterial3: true,

@@ -55,9 +55,10 @@ class MenuBottomSheetView extends StatelessWidget {
                     children: [
                       Text(
                         'Menu',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
@@ -66,7 +67,7 @@ class MenuBottomSheetView extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Promo Section
                   const Text(
                     'Try Our Other Apps',
@@ -108,9 +109,9 @@ class MenuBottomSheetView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Help Section
                   const Text(
                     'Help & Support',
@@ -127,9 +128,9 @@ class MenuBottomSheetView extends StatelessWidget {
                     iconColor: Colors.amber,
                     onTap: _sendFeedback,
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // About Section
                   const Text(
                     'About',
@@ -186,13 +187,14 @@ class MenuBottomSheetView extends StatelessWidget {
                         applicationName: AppConstants.appName,
                         applicationVersion: '1.0.0',
                         applicationIcon: const Icon(Icons.android, size: 48),
-                        applicationLegalese: '© 2026 ${AppConstants.developerName}',
+                        applicationLegalese:
+                            '© 2026 ${AppConstants.developerName}',
                       );
                     },
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Footer
                   Center(
                     child: Column(
@@ -200,7 +202,8 @@ class MenuBottomSheetView extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(LucideIcons.heart, color: Colors.red, size: 16),
+                            const Icon(LucideIcons.heart,
+                                color: Colors.red, size: 16),
                             const SizedBox(width: 8),
                             Text(
                               'Made with love by ${AppConstants.developerName}',
@@ -276,7 +279,7 @@ class MenuBottomSheetView extends StatelessWidget {
     final Uri params = Uri(
       scheme: 'mailto',
       path: AppConstants.email,
-      query: 'subject=AppScope Feedback&body=Hi ${AppConstants.developerName},',
+      query: 'subject=AppDNA Feedback&body=Hi ${AppConstants.developerName},',
     );
     if (await canLaunchUrl(params)) {
       await launchUrl(params);
@@ -294,7 +297,7 @@ class MenuBottomSheetView extends StatelessWidget {
 
   void _shareApp() {
     Share.share(
-      'Check out AppScope Framework Detector! Find out what frameworks your favorite apps use.\n\nPlay Store: ${AppConstants.playStoreUrl}',
+      'Check out AppDNA Framework Detector! Find out what frameworks your favorite apps use.\n\nPlay Store: ${AppConstants.playStoreUrl}',
     );
   }
 }
@@ -369,7 +372,7 @@ class CustomRowTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    
+
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),

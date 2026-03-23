@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     
     <application
-        android:label="AppScope"
+        android:label="AppDNA"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

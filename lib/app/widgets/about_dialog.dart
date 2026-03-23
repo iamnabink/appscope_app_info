@@ -7,21 +7,23 @@ class AboutDialogWidget {
       builder: (context) {
         final textTheme = Theme.of(context).textTheme;
         return AlertDialog(
-          title: const Text('About AppScope'),
+          title: const Text('About AppDNA'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Developer',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               const Text('Nabraj Khadka'),
               const SizedBox(height: 12),
               Text(
                 'Website',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               SelectableText(
@@ -33,7 +35,8 @@ class AboutDialogWidget {
               const SizedBox(height: 12),
               Text(
                 'GitHub',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               SelectableText(
@@ -45,7 +48,8 @@ class AboutDialogWidget {
               const SizedBox(height: 12),
               Text(
                 'LinkedIn',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               SelectableText(
@@ -72,4 +76,3 @@ class AboutDialogWidget {
     );
   }
 }
-
