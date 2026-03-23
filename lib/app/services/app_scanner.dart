@@ -11,15 +11,27 @@ class AppScanner {
         return AppInfo(
           packageName: app['packageName'] ?? '',
           appName: app['appName'] ?? 'Unknown',
-          icon: app['icon'] != null ? Uint8List.fromList(List<int>.from(app['icon'])) : null,
+          icon: null, // Icons are now loaded lazily
           framework: FrameworkType.native, // Will be detected later
           apkPath: app['apkPath'],
+          apkSize: app['apkSize'] != null ? (app['apkSize'] as num).toInt() : null,
+          installDate: app['installDate'],
           isSystemApp: app['isSystemApp'] ?? false,
           isUpdatedSystemApp: app['isUpdatedSystemApp'] ?? false,
         );
       }).toList();
     } catch (e) {
       throw Exception('Failed to scan apps: $e');
+    }
+  }
+
+  Future<Uint8List?> getAppIcon(String packageName) async {
+    try {
+      final dynamic iconData = await _channel.invokeMethod('getAppIcon', {'packageName': packageName});
+      if (iconData == null) return null;
+      return Uint8List.fromList(List<int>.from(iconData));
+    } catch (e) {
+      return null;
     }
   }
 
@@ -37,9 +49,7 @@ class AppScanner {
       return AppInfo(
         packageName: details['packageName'] ?? '',
         appName: details['appName'] ?? 'Unknown',
-        icon: details['icon'] != null 
-            ? Uint8List.fromList(List<int>.from(details['icon'])) 
-            : null,
+        icon: null, // Icons are now loaded lazily or via getAppIcon
         framework: FrameworkType.native, // Will be detected later if needed
         apkPath: details['apkPath'],
         versionName: details['versionName'],

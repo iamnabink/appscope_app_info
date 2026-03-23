@@ -3,6 +3,7 @@ import 'package:shimmer/shimmer.dart';
 import '../models/app_info.dart';
 import '../services/app_scanner.dart';
 import '../services/framework_detector.dart';
+import '../widgets/app_icon.dart';
 
 class AppDetailsScreen extends StatefulWidget {
   final AppInfo app;
@@ -230,16 +231,10 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> {
                         child: Column(
                           children: [
                             // App Icon
-                            app.icon != null
-                                ? Image.memory(
-                                    app.icon!,
-                                    width: 96,
-                                    height: 96,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(Icons.android, size: 96);
-                                    },
-                                  )
-                                : const Icon(Icons.android, size: 96),
+                            AppIcon(
+                              packageName: app.packageName,
+                              size: 96,
+                            ),
                             const SizedBox(height: 16),
                             // App Name
                             Text(

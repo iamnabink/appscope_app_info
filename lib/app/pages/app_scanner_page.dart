@@ -3,6 +3,7 @@ import '../models/app_info.dart';
 import '../services/app_scanner.dart';
 import '../services/framework_detector.dart';
 import '../utils/app_filter.dart';
+import '../models/app_list_filters.dart';
 import '../widgets/modern_app_bar.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/stats_card.dart';
@@ -10,6 +11,7 @@ import '../widgets/app_list_item.dart';
 import '../widgets/loading_shimmer.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/about_dialog.dart';
+import '../widgets/app_filter_sheet.dart';
 import '../screens/app_details_screen.dart';
 
 class AppScannerPage extends StatefulWidget {
@@ -38,6 +40,11 @@ class _AppScannerPageState extends State<AppScannerPage> {
   Map<FrameworkType, int> _frameworkCounts = {};
   bool _isSearchExpanded = false;
 
+  // Filter criteria (applied on top of the search query).
+  Set<FrameworkType> _selectedFrameworks = const {};
+  AppSizePreset _appSizePreset = AppSizePreset.any;
+  InstallTimePreset _installTimePreset = InstallTimePreset.any;
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +62,13 @@ class _AppScannerPageState extends State<AppScannerPage> {
   void _filterApps() {
     final query = _searchController.text;
     setState(() {
-      _filteredApps = AppFilter.filterApps(_apps, query);
+      _filteredApps = AppFilter.filterAppsByCriteria(
+        apps: _apps,
+        query: query,
+        frameworkFilters: _selectedFrameworks,
+        appSizePreset: _appSizePreset,
+        installTimePreset: _installTimePreset,
+      );
     });
   }
 
@@ -77,8 +90,8 @@ class _AppScannerPageState extends State<AppScannerPage> {
 
       final List<AppInfo> detectedApps = [];
 
-      // Process apps in batches to avoid blocking UI
-      const batchSize = 10;
+      // Process apps in small batches to avoid memory spikes and blocking UI
+      const batchSize = 2;
       for (int i = 0; i < userApps.length; i += batchSize) {
         final batch = userApps.skip(i).take(batchSize).toList();
 
@@ -116,7 +129,13 @@ class _AppScannerPageState extends State<AppScannerPage> {
         if (mounted) {
           setState(() {
             _apps = List.from(detectedApps);
-            _filteredApps = AppFilter.filterApps(_apps, _searchController.text);
+            _filteredApps = AppFilter.filterAppsByCriteria(
+              apps: _apps,
+              query: _searchController.text,
+              frameworkFilters: _selectedFrameworks,
+              appSizePreset: _appSizePreset,
+              installTimePreset: _installTimePreset,
+            );
           });
         }
       }
@@ -130,7 +149,13 @@ class _AppScannerPageState extends State<AppScannerPage> {
       if (mounted) {
         setState(() {
           _apps = detectedApps;
-          _filteredApps = AppFilter.filterApps(detectedApps, _searchController.text);
+          _filteredApps = AppFilter.filterAppsByCriteria(
+            apps: detectedApps,
+            query: _searchController.text,
+            frameworkFilters: _selectedFrameworks,
+            appSizePreset: _appSizePreset,
+            installTimePreset: _installTimePreset,
+          );
           _frameworkCounts = counts;
           _isScanning = false;
         });
@@ -148,6 +173,13 @@ class _AppScannerPageState extends State<AppScannerPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final hasActiveFrameworkFilters = _selectedFrameworks.isNotEmpty;
+    final hasActiveSizeFilters = _appSizePreset != AppSizePreset.any;
+    final hasActiveInstallTimeFilters = _installTimePreset != InstallTimePreset.any;
+    final int activeFilterCount =
+        (hasActiveFrameworkFilters ? 1 : 0) +
+        (hasActiveSizeFilters ? 1 : 0) +
+        (hasActiveInstallTimeFilters ? 1 : 0);
 
     return Scaffold(
       appBar: ModernAppBar(
@@ -201,11 +233,31 @@ class _AppScannerPageState extends State<AppScannerPage> {
                     if (!_isSearchExpanded && _apps.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                        child: SearchBarWidget(
-                          controller: _searchController,
-                          onClear: () {
-                            _searchController.clear();
-                          },
+                        child: Column(
+                          children: [
+                            SearchBarWidget(
+                              controller: _searchController,
+                              onClear: () {
+                                _searchController.clear();
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => _openFilterSheet(),
+                                    icon: const Icon(Icons.filter_list),
+                                    label: Text(
+                                      activeFilterCount == 0
+                                          ? 'Filters'
+                                          : 'Filters ($activeFilterCount)',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     // Statistics Card
@@ -215,6 +267,26 @@ class _AppScannerPageState extends State<AppScannerPage> {
                         child: StatsCard(
                           frameworkCounts: _frameworkCounts,
                           totalApps: _apps.length,
+                        ),
+                      ),
+                    // Filters button (when search is expanded in AppBar)
+                    if (_isSearchExpanded && _apps.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _openFilterSheet(),
+                                icon: const Icon(Icons.filter_list),
+                                label: Text(
+                                  activeFilterCount == 0
+                                      ? 'Filters'
+                                      : 'Filters ($activeFilterCount)',
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     // Search results count
@@ -271,6 +343,40 @@ class _AppScannerPageState extends State<AppScannerPage> {
                   ],
                 ),
     );
+  }
+
+  Future<void> _openFilterSheet() async {
+    if (_apps.isEmpty) return;
+
+    final initialFilters = AppListFilters(
+      frameworks: _selectedFrameworks,
+      appSizePreset: _appSizePreset,
+      installTimePreset: _installTimePreset,
+    );
+
+    final result = await showModalBottomSheet<AppListFilters>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      builder: (context) {
+        return AppFilterSheet(initialFilters: initialFilters);
+      },
+    );
+
+    if (result == null) return;
+
+    setState(() {
+      _selectedFrameworks = result.frameworks;
+      _appSizePreset = result.appSizePreset;
+      _installTimePreset = result.installTimePreset;
+      _filteredApps = AppFilter.filterAppsByCriteria(
+        apps: _apps,
+        query: _searchController.text,
+        frameworkFilters: _selectedFrameworks,
+        appSizePreset: _appSizePreset,
+        installTimePreset: _installTimePreset,
+      );
+    });
   }
 }
 

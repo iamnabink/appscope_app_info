@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import '../models/app_info.dart';
 
 class FrameworkDetector {
@@ -14,9 +15,9 @@ class FrameworkDetector {
         return FrameworkType.native;
       }
 
-      // Read APK as ZIP
-      final bytes = await apkFile.readAsBytes();
-      final archive = ZipDecoder().decodeBytes(bytes);
+      // Use InputFileStream to avoid reading the entire APK into memory
+      final inputStream = InputFileStream(app.apkPath!);
+      final archive = ZipDecoder().decodeBuffer(inputStream);
 
       // Check for Flutter
       if (_hasFlutterAssets(archive)) {

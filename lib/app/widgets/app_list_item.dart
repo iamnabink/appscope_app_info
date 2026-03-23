@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/app_info.dart';
 import '../utils/framework_utils.dart';
+import 'app_icon.dart';
 
 class AppListItem extends StatelessWidget {
   final AppInfo app;
@@ -23,16 +24,7 @@ class AppListItem extends StatelessWidget {
         vertical: 8,
       ),
       child: ListTile(
-        leading: app.icon != null
-            ? Image.memory(
-                app.icon!,
-                width: 48,
-                height: 48,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(Icons.android, size: 48);
-                },
-              )
-            : const Icon(Icons.android, size: 48),
+        leading: AppIcon(packageName: app.packageName),
         title: Text(
           app.appName,
           style: const TextStyle(fontWeight: FontWeight.bold),
