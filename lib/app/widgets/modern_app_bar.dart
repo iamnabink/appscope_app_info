@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'menu_bottomsheet_view.dart';
 
 class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isSearchExpanded;
@@ -121,44 +122,13 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onThemeToggle,
           tooltip: isDarkMode ? 'Switch to light mode' : 'Switch to dark mode',
         ),
-        PopupMenuButton<String>(
+        IconButton(
           icon: const Icon(Icons.more_vert),
-          onSelected: (value) {
-            if (value == 'info' && onAbout != null) {
-              onAbout!();
-            } else if (value == 'refresh' && onRefresh != null && !isScanning) {
-              onRefresh!();
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'refresh',
-              enabled: !isScanning,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.refresh,
-                    size: 20,
-                    color: isScanning
-                        ? colorScheme.onSurface.withOpacity(0.38)
-                        : colorScheme.onSurface,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('Refresh'),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 'info',
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 20, color: colorScheme.onSurface),
-                  const SizedBox(width: 12),
-                  const Text('About'),
-                ],
-              ),
-            ),
-          ],
+          onPressed: () => MenuBottomSheetView.show(
+            context,
+            onRefresh: onRefresh,
+          ),
+          tooltip: 'Menu',
         ),
       ],
     );
