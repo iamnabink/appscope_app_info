@@ -16,7 +16,7 @@ AppDNA is a Flutter utility (maintained by [@iamnabink](https://github.com/iamna
   <img src="assets/ss1.png" alt="AppDNA home list" width="45%" />
   <img src="assets/ss2.png" alt="AppDNA detail view" width="45%" />
   <img src="assets/ss3.png" alt="AppDNA detail view" width="45%" />
-  <img src="assets/ss43.png" alt="AppDNA detail view" width="45%" />
+  <img src="assets/ss4.png" alt="AppDNA detail view" width="45%" />
 </p>
 
 ## 🏗️ Tech Stack
