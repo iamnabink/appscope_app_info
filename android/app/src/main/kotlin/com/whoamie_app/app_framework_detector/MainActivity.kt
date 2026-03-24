@@ -217,30 +217,15 @@ class MainActivity: FlutterActivity() {
             }
             details["installDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(packageInfo.firstInstallTime))
             
-            // Add usage stats with more robust debugging
-            val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-            val endTime = System.currentTimeMillis()
-            // 10 years ago to ensure we get "total" usage
-            val startTime = endTime - (1000L * 60 * 60 * 24 * 365 * 10) 
+            // Add usage stats using the same consistent logic as getInstalledApps
+            val usageStatsMap = getUsageStatsMap()
+            val usageStats = usageStatsMap[packageName]
             
-            val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime)
-            val filteredStats = stats?.filter { it.packageName == packageName }
-            
-            var totalTime = 0L
-            var lastUsed = 0L
-            
-            filteredStats?.forEach {
-                totalTime += it.totalTimeInForeground
-                if (it.lastTimeUsed > lastUsed) {
-                    lastUsed = it.lastTimeUsed
-                }
+            details["appUsage"] = usageStats?.totalTimeInForeground ?: 0L
+            if (usageStats != null && usageStats.lastTimeUsed > 0) {
+                details["lastUsedDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(usageStats.lastTimeUsed))
             }
-            
-            details["appUsage"] = totalTime
-            if (lastUsed > 0) {
-                details["lastUsedDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(lastUsed))
-            }
-            Log.d(TAG, "Stats for $packageName: usage=$totalTime ms, lastUsed=$lastUsed")
+            Log.d(TAG, "Stats for $packageName: usage=${details["appUsage"]} ms, lastUsed=${details["lastUsedDate"]}")
 
             details["apkSize"] = File(appInfo.sourceDir).length()
             details["isSystemApp"] = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
