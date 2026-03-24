@@ -85,5 +85,22 @@ class AppScanner {
       throw Exception('Failed to uninstall app: $e');
     }
   }
+
+  Future<bool> hasUsagePermission() async {
+    try {
+      final bool? result = await _channel.invokeMethod('hasUsagePermission');
+      return result ?? false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> openUsageSettings() async {
+    try {
+      await _channel.invokeMethod('openUsageSettings');
+    } catch (e) {
+      // Ignore
+    }
+  }
 }
 

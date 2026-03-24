@@ -23,6 +23,8 @@ import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Calendar
+import android.provider.Settings
 import kotlinx.coroutines.*
 
 class MainActivity: FlutterActivity() {
@@ -109,6 +111,13 @@ class MainActivity: FlutterActivity() {
                         result.error("ERROR", "Failed to uninstall app: ${e.message}", null)
                     }
                 }
+                "hasUsagePermission" -> {
+                    result.success(hasUsageStatsPermission())
+                }
+                "openUsageSettings" -> {
+                    openUsageAccessSettings()
+                    result.success(true)
+                }
                 else -> {
                     result.notImplemented()
                 }
@@ -135,6 +144,10 @@ class MainActivity: FlutterActivity() {
         
         val installedPackages = packageManager.getInstalledPackages(flags)
         
+        // Fetch usage stats ONCE before the loop for better performance
+        val usageStatsMap = getUsageStatsMap()
+        Log.d(TAG, "Fetched usage stats for ${usageStatsMap.size} packages")
+
         for (packageInfo in installedPackages) {
             try {
                 val appInfo = packageInfo.applicationInfo ?: continue
@@ -143,8 +156,7 @@ class MainActivity: FlutterActivity() {
                 val packageName = packageInfo.packageName
                 val apkPath = appInfo.sourceDir
                 
-                // Fetch usage stats if available
-                val usageStatsMap = getUsageStatsMap()
+                // Get usage stats from the map
                 val usageStats = usageStatsMap[packageName]
                 val appUsage = usageStats?.totalTimeInForeground ?: 0L
                 val lastUsedDate = if (usageStats != null && usageStats.lastTimeUsed > 0) {
@@ -205,17 +217,30 @@ class MainActivity: FlutterActivity() {
             }
             details["installDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(packageInfo.firstInstallTime))
             
-            // Add usage stats
+            // Add usage stats with more robust debugging
             val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
             val endTime = System.currentTimeMillis()
-            val startTime = endTime - 1000L * 60 * 60 * 24 * 365 // 1 year ago
-            val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, startTime, endTime)
-            val appUsageStats = stats?.find { it.packageName == packageName }
+            // 10 years ago to ensure we get "total" usage
+            val startTime = endTime - (1000L * 60 * 60 * 24 * 365 * 10) 
             
-            details["appUsage"] = appUsageStats?.totalTimeInForeground ?: 0L
-            if (appUsageStats != null && appUsageStats.lastTimeUsed > 0) {
-                details["lastUsedDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(appUsageStats.lastTimeUsed))
+            val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime)
+            val filteredStats = stats?.filter { it.packageName == packageName }
+            
+            var totalTime = 0L
+            var lastUsed = 0L
+            
+            filteredStats?.forEach {
+                totalTime += it.totalTimeInForeground
+                if (it.lastTimeUsed > lastUsed) {
+                    lastUsed = it.lastTimeUsed
+                }
             }
+            
+            details["appUsage"] = totalTime
+            if (lastUsed > 0) {
+                details["lastUsedDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(lastUsed))
+            }
+            Log.d(TAG, "Stats for $packageName: usage=$totalTime ms, lastUsed=$lastUsed")
 
             details["apkSize"] = File(appInfo.sourceDir).length()
             details["isSystemApp"] = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
@@ -277,12 +302,46 @@ class MainActivity: FlutterActivity() {
         }
     }
     private fun getUsageStatsMap(): Map<String, UsageStats> {
+        return try {
+            val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+            val endTime = System.currentTimeMillis()
+            // 10 years ago to ensure we get "total" usage
+            val startTime = endTime - (1000L * 60 * 60 * 24 * 365 * 10) 
+            
+            val statsMap = usageStatsManager.queryAndAggregateUsageStats(startTime, endTime)
+            if (statsMap == null || statsMap.isEmpty()) {
+                Log.w(TAG, "Usage stats map is null or empty. Ensure Usage Access is granted in Settings.")
+                emptyMap()
+            } else {
+                statsMap
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get usage stats: ${e.message}")
+            emptyMap()
+        }
+    }
+
+    private fun hasUsageStatsPermission(): Boolean {
         val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-        val endTime = System.currentTimeMillis()
-        val startTime = endTime - 1000L * 60 * 60 * 24 * 365 // 1 year ago
-        
-        val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, startTime, endTime)
-        return stats?.associateBy { it.packageName } ?: emptyMap()
+        val time = System.currentTimeMillis()
+        val stats = usageStatsManager.queryUsageStats(
+            UsageStatsManager.INTERVAL_DAILY,
+            time - 1000 * 60,
+            time
+        )
+        return stats != null && stats.isNotEmpty()
+    }
+
+    private fun openUsageAccessSettings() {
+        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+            data = Uri.parse("package:$packageName")
+        }
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Fallback to general settings if deep link fails
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+        }
     }
 }
 

@@ -5,6 +5,7 @@ import '../services/app_scanner.dart';
 import '../services/framework_detector.dart';
 import '../utils/format_utils.dart';
 import '../widgets/app_icon.dart';
+import '../widgets/usage_permission_dialog.dart';
 
 class AppDetailsScreen extends StatefulWidget {
   final AppInfo app;
@@ -24,11 +25,22 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> {
   String? _errorMessage;
   bool _isUninstalling = false;
   bool _isLoaderVisible = false;
+  bool _hasUsagePermission = true;
 
   @override
   void initState() {
     super.initState();
+    _checkPermission();
     _loadAppDetails();
+  }
+
+  Future<void> _checkPermission() async {
+    final granted = await _appScanner.hasUsagePermission();
+    if (mounted) {
+      setState(() {
+        _hasUsagePermission = granted;
+      });
+    }
   }
 
   Future<void> _loadAppDetails() async {
@@ -215,6 +227,48 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Usage Permission Warning
+                      if (!_hasUsagePermission)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                          child: Card(
+                            color: Theme.of(context).colorScheme.errorContainer,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.onErrorContainer),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Usage stats permission is required.',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onErrorContainer,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      UsagePermissionDialog.show(
+                                        context,
+                                        onGranted: () async {
+                                          await _appScanner.openUsageSettings();
+                                          Future.delayed(const Duration(seconds: 2), () {
+                                            _checkPermission();
+                                            _loadAppDetails();
+                                          });
+                                        },
+                                      );
+                                    },
+                                    child: const Text('Grant'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       // App Header
                       Container(
                         width: double.infinity,

@@ -11,6 +11,7 @@ import '../widgets/loading_shimmer.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/about_dialog.dart';
 import '../widgets/app_filter_sheet.dart';
+import '../widgets/usage_permission_dialog.dart';
 import '../screens/app_details_screen.dart';
 
 class AppScannerPage extends StatefulWidget {
@@ -38,6 +39,7 @@ class _AppScannerPageState extends State<AppScannerPage> {
   String _errorMessage = '';
   Map<FrameworkType, int> _frameworkCounts = {};
   bool _isSearchExpanded = false;
+  bool _hasUsagePermission = false;
 
   // Filter criteria (applied on top of the search query).
   Set<FrameworkType> _selectedFrameworks = const {};
@@ -48,7 +50,17 @@ class _AppScannerPageState extends State<AppScannerPage> {
   void initState() {
     super.initState();
     _searchController.addListener(_filterApps);
+    _checkPermission();
     _scanApps();
+  }
+
+  Future<void> _checkPermission() async {
+    final granted = await _appScanner.hasUsagePermission();
+    if (mounted) {
+      setState(() {
+        _hasUsagePermission = granted;
+      });
+    }
   }
 
   @override
@@ -213,10 +225,53 @@ class _AppScannerPageState extends State<AppScannerPage> {
                 )
               : Column(
                   children: [
+                    // Usage Permission Warning
+                    if (!_hasUsagePermission && !_isSearchExpanded)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        child: Card(
+                          color: colorScheme.errorContainer,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                Icon(Icons.warning_amber_rounded, color: colorScheme.onErrorContainer),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Usage stats permission is required for accurate stats.',
+                                    style: TextStyle(
+                                      color: colorScheme.onErrorContainer,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    UsagePermissionDialog.show(
+                                      context,
+                                      onGranted: () async {
+                                        await _appScanner.openUsageSettings();
+                                        // Give user time to come back and then re-check
+                                        Future.delayed(
+                                          const Duration(seconds: 2),
+                                          _checkPermission,
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: const Text('Grant'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     // Statistics Card
                     if (_frameworkCounts.isNotEmpty && !_isSearchExpanded)
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                         child: StatsCard(
                           frameworkCounts: _frameworkCounts,
                           totalApps: _apps.length,
