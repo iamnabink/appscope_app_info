@@ -1,7 +1,7 @@
 name: whoamie_app
 description: A Flutter app that scans installed apps and detects their frameworks
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.2+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
