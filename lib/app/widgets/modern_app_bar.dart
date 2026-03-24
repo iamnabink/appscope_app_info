@@ -107,11 +107,11 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
       actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: onSearchToggle,
-            tooltip: 'Search apps',
-          ),
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: onSearchToggle,
+          tooltip: 'Search apps',
+        ),
         if (!isSearchExpanded)
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -124,16 +124,19 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: onSearchClose,
             tooltip: 'Close search',
           ),
-        IconButton(
-          icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
-          onPressed: onThemeToggle,
-          tooltip: isDarkMode ? 'Switch to light mode' : 'Switch to dark mode',
-        ),
+        if (onRefresh != null && !isScanning)
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: onRefresh,
+            tooltip: 'Refresh scan',
+          ),
         IconButton(
           icon: const Icon(Icons.more_vert),
           onPressed: () => MenuBottomSheetView.show(
             context,
             onRefresh: onRefresh,
+            onThemeToggle: onThemeToggle,
+            isDarkMode: isDarkMode,
           ),
           tooltip: 'Menu',
         ),

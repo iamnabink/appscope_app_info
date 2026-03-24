@@ -9,15 +9,31 @@ import '../utils/app_constants.dart';
 
 class MenuBottomSheetView extends StatelessWidget {
   final VoidCallback? onRefresh;
+  final VoidCallback? onThemeToggle;
+  final bool isDarkMode;
 
-  const MenuBottomSheetView({super.key, this.onRefresh});
+  const MenuBottomSheetView({
+    super.key,
+    this.onRefresh,
+    this.onThemeToggle,
+    required this.isDarkMode,
+  });
 
-  static Future<void> show(BuildContext context, {VoidCallback? onRefresh}) {
+  static Future<void> show(
+    BuildContext context, {
+    VoidCallback? onRefresh,
+    VoidCallback? onThemeToggle,
+    bool isDarkMode = false,
+  }) {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => MenuBottomSheetView(onRefresh: onRefresh),
+      builder: (context) => MenuBottomSheetView(
+        onRefresh: onRefresh,
+        onThemeToggle: onThemeToggle,
+        isDarkMode: isDarkMode,
+      ),
     );
   }
 
@@ -128,6 +144,35 @@ class MenuBottomSheetView extends StatelessWidget {
                     iconColor: Colors.amber,
                     onTap: _sendFeedback,
                   ),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    secondary: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.purple.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                        color: Colors.purple,
+                        size: 20,
+                      ),
+                    ),
+                    title: const Text(
+                      'Dark Mode',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    value: isDarkMode,
+                    onChanged: (value) {
+                      if (onThemeToggle != null) {
+                        onThemeToggle!();
+                      }
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                  ),
 
                   const SizedBox(height: 24),
 
@@ -165,17 +210,6 @@ class MenuBottomSheetView extends StatelessWidget {
                     onTap: _shareApp,
                   ),
                   const SizedBox(height: 8),
-                  CustomRowTile(
-                    title: 'Refresh Scan',
-                    iconName: LucideIcons.rotateCw,
-                    iconColor: Colors.blue,
-                    onTap: () {
-                      Navigator.pop(context);
-                      if (onRefresh != null) {
-                        onRefresh!();
-                      }
-                    },
-                  ),
                   const SizedBox(height: 8),
                   CustomRowTile(
                     title: 'App Information',
