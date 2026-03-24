@@ -24,6 +24,8 @@ class AppInfo {
   final bool? isEnabled;
   final int? targetSdkVersion;
   final int? minSdkVersion;
+  final int? appUsage;
+  final String? lastUsedDate;
 
   AppInfo({
     required this.packageName,
@@ -40,6 +42,8 @@ class AppInfo {
     this.isEnabled,
     this.targetSdkVersion,
     this.minSdkVersion,
+    this.appUsage,
+    this.lastUsedDate,
   });
   
   AppInfo copyWith({
@@ -57,6 +61,8 @@ class AppInfo {
     bool? isEnabled,
     int? targetSdkVersion,
     int? minSdkVersion,
+    int? appUsage,
+    String? lastUsedDate,
   }) {
     return AppInfo(
       packageName: packageName ?? this.packageName,
@@ -73,6 +79,8 @@ class AppInfo {
       isEnabled: isEnabled ?? this.isEnabled,
       targetSdkVersion: targetSdkVersion ?? this.targetSdkVersion,
       minSdkVersion: minSdkVersion ?? this.minSdkVersion,
+      appUsage: appUsage ?? this.appUsage,
+      lastUsedDate: lastUsedDate ?? this.lastUsedDate,
     );
   }
 }

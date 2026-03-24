@@ -15,6 +15,8 @@ void main() {
       framework: FrameworkType.flutter,
       apkSize: 5 * 1024 * 1024, // 5 MB
       installDate: last7Days,
+      appUsage: 3600000, // 1 hour
+      lastUsedDate: last7Days,
     ),
     AppInfo(
       packageName: 'com.example.rn',
@@ -108,6 +110,12 @@ void main() {
         installTimePreset: InstallTimePreset.olderThan1Year,
       );
       expect(results.length, 2); // Unity and Native
+    });
+
+    test('Verify usage stats fields', () {
+      final app = testApps.first;
+      expect(app.appUsage, 3600000);
+      expect(app.lastUsedDate, last7Days);
     });
   });
 }

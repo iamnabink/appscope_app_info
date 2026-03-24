@@ -1,6 +1,10 @@
 package com.whoamie_app.appdna
 
+import android.app.usage.UsageStats
+import android.app.usage.UsageStatsManager
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -8,7 +12,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.NonNull
@@ -139,6 +142,15 @@ class MainActivity: FlutterActivity() {
                 val appName = packageManager.getApplicationLabel(appInfo).toString()
                 val packageName = packageInfo.packageName
                 val apkPath = appInfo.sourceDir
+                
+                // Fetch usage stats if available
+                val usageStatsMap = getUsageStatsMap()
+                val usageStats = usageStatsMap[packageName]
+                val appUsage = usageStats?.totalTimeInForeground ?: 0L
+                val lastUsedDate = if (usageStats != null && usageStats.lastTimeUsed > 0) {
+                    dateFormat.format(Date(usageStats.lastTimeUsed))
+                } else null
+
                 val installDate = dateFormat.format(Date(packageInfo.firstInstallTime))
                 val apkSize = File(appInfo.sourceDir).length()
                 
@@ -155,7 +167,9 @@ class MainActivity: FlutterActivity() {
                     "installDate" to installDate,
                     "apkSize" to apkSize,
                     "isSystemApp" to isSystemApp,
-                    "isUpdatedSystemApp" to isUpdatedSystemApp
+                    "isUpdatedSystemApp" to isUpdatedSystemApp,
+                    "appUsage" to appUsage,
+                    "lastUsedDate" to lastUsedDate
                 ))
             } catch (e: Exception) {
                 continue
@@ -190,6 +204,19 @@ class MainActivity: FlutterActivity() {
                 packageInfo.versionCode.toLong()
             }
             details["installDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(packageInfo.firstInstallTime))
+            
+            // Add usage stats
+            val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+            val endTime = System.currentTimeMillis()
+            val startTime = endTime - 1000L * 60 * 60 * 24 * 365 // 1 year ago
+            val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, startTime, endTime)
+            val appUsageStats = stats?.find { it.packageName == packageName }
+            
+            details["appUsage"] = appUsageStats?.totalTimeInForeground ?: 0L
+            if (appUsageStats != null && appUsageStats.lastTimeUsed > 0) {
+                details["lastUsedDate"] = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(appUsageStats.lastTimeUsed))
+            }
+
             details["apkSize"] = File(appInfo.sourceDir).length()
             details["isSystemApp"] = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
             details["isUpdatedSystemApp"] = (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
@@ -248,6 +275,14 @@ class MainActivity: FlutterActivity() {
         } catch (e: Exception) {
             null
         }
+    }
+    private fun getUsageStatsMap(): Map<String, UsageStats> {
+        val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        val endTime = System.currentTimeMillis()
+        val startTime = endTime - 1000L * 60 * 60 * 24 * 365 // 1 year ago
+        
+        val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, startTime, endTime)
+        return stats?.associateBy { it.packageName } ?: emptyMap()
     }
 }
 

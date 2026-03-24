@@ -3,6 +3,7 @@ import 'package:shimmer/shimmer.dart';
 import '../models/app_info.dart';
 import '../services/app_scanner.dart';
 import '../services/framework_detector.dart';
+import '../utils/format_utils.dart';
 import '../widgets/app_icon.dart';
 
 class AppDetailsScreen extends StatefulWidget {
@@ -143,11 +144,11 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> {
   }
 
   String _formatBytes(int? bytes) {
-    if (bytes == null) return 'Unknown';
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(2)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
+    return FormatUtils.formatBytes(bytes);
+  }
+
+  String _formatUsage(int? ms) {
+    return FormatUtils.formatUsage(ms);
   }
 
   Color _getFrameworkColor(FrameworkType framework) {
@@ -298,6 +299,8 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> {
                             _buildDetailRow('Version Code', app.versionCode?.toString() ?? 'Unknown'),
                             _buildDetailRow('APK Size', _formatBytes(app.apkSize)),
                             _buildDetailRow('Install Date', app.installDate ?? 'Unknown'),
+                            _buildDetailRow('Last Used', app.lastUsedDate ?? 'Never'),
+                            _buildDetailRow('Total Usage', _formatUsage(app.appUsage)),
                             _buildDetailRow('APK Path', app.apkPath ?? 'Unknown'),
                             const SizedBox(height: 8),
                             Text(

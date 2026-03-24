@@ -18,6 +18,8 @@ class AppScanner {
           installDate: app['installDate'],
           isSystemApp: app['isSystemApp'] ?? false,
           isUpdatedSystemApp: app['isUpdatedSystemApp'] ?? false,
+          appUsage: app['appUsage'] != null ? (app['appUsage'] as num).toInt() : null,
+          lastUsedDate: app['lastUsedDate'],
         );
       }).toList();
     } catch (e) {
@@ -62,6 +64,8 @@ class AppScanner {
             : null,
         isSystemApp: details['isSystemApp'],
         isUpdatedSystemApp: details['isUpdatedSystemApp'],
+        appUsage: details['appUsage'] != null ? (details['appUsage'] as num).toInt() : null,
+        lastUsedDate: details['lastUsedDate'],
         isEnabled: details['isEnabled'],
         targetSdkVersion: details['targetSdkVersion'],
         minSdkVersion: details['minSdkVersion'],
