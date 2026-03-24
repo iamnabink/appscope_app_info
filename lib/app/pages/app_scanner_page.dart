@@ -5,7 +5,6 @@ import '../services/framework_detector.dart';
 import '../utils/app_filter.dart';
 import '../models/app_list_filters.dart';
 import '../widgets/modern_app_bar.dart';
-import '../widgets/search_bar.dart';
 import '../widgets/stats_card.dart';
 import '../widgets/app_list_item.dart';
 import '../widgets/loading_shimmer.dart';
@@ -99,26 +98,10 @@ class _AppScannerPageState extends State<AppScannerPage> {
           batch.map((app) async {
             try {
               final framework = await _frameworkDetector.detectFramework(app);
-              return AppInfo(
-                packageName: app.packageName,
-                appName: app.appName,
-                icon: app.icon,
-                framework: framework,
-                apkPath: app.apkPath,
-                isSystemApp: app.isSystemApp,
-                isUpdatedSystemApp: app.isUpdatedSystemApp,
-              );
+              return app.copyWith(framework: framework);
             } catch (e) {
               // If detection fails, mark as Native
-              return AppInfo(
-                packageName: app.packageName,
-                appName: app.appName,
-                icon: app.icon,
-                framework: FrameworkType.native,
-                apkPath: app.apkPath,
-                isSystemApp: app.isSystemApp,
-                isUpdatedSystemApp: app.isUpdatedSystemApp,
-              );
+              return app.copyWith(framework: FrameworkType.native);
             }
           }),
         ).then((results) {
@@ -198,6 +181,7 @@ class _AppScannerPageState extends State<AppScannerPage> {
         },
         onThemeToggle: widget.onToggleTheme,
         onRefresh: _scanApps,
+        onFilterToggle: _openFilterSheet,
         onAbout: () => AboutDialogWidget.show(context),
         isDarkMode: widget.isDarkMode,
         isScanning: _isScanning,
@@ -229,37 +213,6 @@ class _AppScannerPageState extends State<AppScannerPage> {
                 )
               : Column(
                   children: [
-                    // Search Bar (when not expanded in AppBar)
-                    if (!_isSearchExpanded && _apps.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                        child: Column(
-                          children: [
-                            SearchBarWidget(
-                              controller: _searchController,
-                              onClear: () {
-                                _searchController.clear();
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () => _openFilterSheet(),
-                                    icon: const Icon(Icons.filter_list),
-                                    label: Text(
-                                      activeFilterCount == 0
-                                          ? 'Filters'
-                                          : 'Filters ($activeFilterCount)',
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
                     // Statistics Card
                     if (_frameworkCounts.isNotEmpty && !_isSearchExpanded)
                       Padding(

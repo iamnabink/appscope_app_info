@@ -95,9 +95,12 @@ class AppFilter {
             app.framework == FrameworkType.reactNative) {
           matchesFramework = true;
         }
+        if (effectiveFrameworkFilters.contains(FrameworkType.unity) &&
+            app.framework == FrameworkType.unity) {
+          matchesFramework = true;
+        }
         if (effectiveFrameworkFilters.contains(FrameworkType.native) &&
-            (app.framework == FrameworkType.native ||
-                app.framework == FrameworkType.unity)) {
+            app.framework == FrameworkType.native) {
           matchesFramework = true;
         }
         if (!matchesFramework) return false;

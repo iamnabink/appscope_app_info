@@ -7,6 +7,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onSearchToggle;
   final VoidCallback? onSearchClose;
   final VoidCallback? onThemeToggle;
+  final VoidCallback? onFilterToggle;
   final VoidCallback? onRefresh;
   final VoidCallback? onAbout;
   final bool isDarkMode;
@@ -19,6 +20,7 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onSearchToggle,
     this.onSearchClose,
     this.onThemeToggle,
+    this.onFilterToggle,
     this.onRefresh,
     this.onAbout,
     required this.isDarkMode,
@@ -105,11 +107,16 @@ class ModernAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
       actions: [
-        if (!isSearchExpanded)
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: onSearchToggle,
             tooltip: 'Search apps',
+          ),
+        if (!isSearchExpanded)
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: onFilterToggle,
+            tooltip: 'Filters',
           ),
         if (isSearchExpanded)
           IconButton(

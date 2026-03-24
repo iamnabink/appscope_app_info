@@ -123,7 +123,15 @@ class _AppFilterSheetState extends State<AppFilterSheet> {
                     CheckboxListTile(
                       dense: true,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                      title: const Text('Native'),
+                      title: const Text('Unity'),
+                      value: _frameworks.contains(FrameworkType.unity),
+                      onChanged: (v) =>
+                          _toggleFramework(FrameworkType.unity, v ?? false),
+                    ),
+                    CheckboxListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                      title: const Text('Native / Other'),
                       value: _frameworks.contains(FrameworkType.native),
                       onChanged: (v) =>
                           _toggleFramework(FrameworkType.native, v ?? false),
